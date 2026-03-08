@@ -7,29 +7,26 @@
         body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a1a1a; color: white; }
         .card { background: #2a2a2a; padding: 2rem; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        #keyDisplay { margin-top: 20px; font-weight: bold; color: #ffeb3b; font-size: 20px; word-break: break-all; }
+        #keyDisplay { margin-top: 20px; font-weight: bold; color: #ffeb3b; font-size: 20px; }
     </style>
 </head>
 <body>
     <div class="card">
         <h2>Vượt lỗi thành công!</h2>
-        <p>Bấm nút bên dưới để lấy Key 12H</p>
-        <button onclick="getKey()">Create Key</button>
+        <p>Chọn loại key bạn muốn nhận:</p>
+        <button onclick="getKey('12h')">Create Key</button>
         <div id="keyDisplay"></div>
     </div>
 
     <script>
     async function getKey() {
         const display = document.getElementById('keyDisplay');
-        display.innerText = "Đang khởi tạo...";
+        display.innerText = "Đang lấy Key...";
 
         try {
-            // Nhớ dùng đúng Port 20112 như ông đã config ở API
+            // Đổi method thành GET và bỏ phần body
             const response = await fetch('http://fi12.bot-hosting.cloud:20112/generate-key', {
-                method: 'POST',
-                headers: { 
-                    'Content-Type': 'application/json'
-                }
+                method: 'GET' 
             });
 
             const data = await response.json();
@@ -37,12 +34,10 @@
             if (response.ok) {
                 display.innerText = "Key của bạn: " + data.key;
             } else {
-                // Hiển thị lỗi từ FastAPI (ví dụ lỗi 429: quá 2 key)
                 display.innerText = "Lỗi: " + (data.detail || "Không thể lấy key");
             }
         } catch (error) {
-            display.innerText = "Không thể kết nối API! (Check Port 20112)";
-            console.error("Lỗi Fetch:", error);
+            display.innerText = "Lỗi kết nối API! Kiểm tra lại Server.";
         }
     }
     </script>
