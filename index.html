@@ -19,15 +19,34 @@
     </div>
 
     <script>
-        async function getKey(duration) {
-            const response = await fetch('fi12.bot-hosting.cloud:20112/generate-key', {
+        <script>
+    async function getKey() {
+        const display = document.getElementById('keyDisplay');
+        display.innerText = "Đang khởi tạo...";
+
+        try {
+            // LƯU Ý: Phải có http:// ở đầu URL
+            const response = await fetch('http://fi12.bot-hosting.cloud:20112/generate-key', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ duration: duration })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    // 'X-Admin-Token': 'chinh_token_cua_ong_o_day' // Chỉ thêm dòng này ở trang quản trị của ông
+                }
             });
+
             const data = await response.json();
-            document.getElementById('keyDisplay').innerText = "Key của bạn: " + data.key;
+
+            if (response.ok) {
+                display.innerText = "Key của bạn: " + data.key;
+            } else {
+                display.innerText = "Lỗi: " + (data.detail || "Không thể lấy key");
+            }
+        } catch (error) {
+            display.innerText = "Lỗi kết nối API! Hãy kiểm tra Server.";
+            console.error(error);
         }
+    }
+</script>
     </script>
 </body>
 </html>
