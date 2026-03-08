@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Key System - Get Your License</title>
+    <style>
+        :root {
+            --primary: #00c6ff;
+            --bg: #0f172a;
+            --card: #1e293b;
+            --text: #f8fafc;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            text-align: center;
+            width: 100%;
+            max-width: 400px;
+            border: 1px solid #334155;
+        }
+
+        h1 { font-size: 1.5rem; margin-bottom: 0.5rem; color: var(--primary); }
+        p { color: #94a3b8; font-size: 0.9rem; }
+
+        .key-box {
+            background: #0f172a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-family: monospace;
+            font-size: 1.2rem;
+            border: 1px dashed var(--primary);
+            word-break: break-all;
+            display: none; /* Ẩn mặc định */
+        }
+
+        .btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        .btn:hover { opacity: 0.8; transform: translateY(-2px); }
+        .loading { display: inline-block; animation: spin 1s linear infinite; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        
+        #status-msg { margin-top: 15px; font-size: 0.85rem; }
+        .error { color: #f87171; }
+        .success { color: #4ade80; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>LICENSE KEY</h1>
+    <p id="info-text">Nhấn nút bên dưới để nhận key của bạn</p>
+    
+    <div id="key-display" class="key-box">ĐANG LẤY KEY...</div>
+    
+    <button id="get-key-btn" class="btn" onclick="claimKey()">NHẬN KEY NGAY</button>
+    
+    <div id="status-msg"></div>
+</div>
+
+<script>
+    // Lấy token từ URL (ví dụ: yourdomain.com/?token=abc)
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get('token');
+    const API_BASE = "http://fi12.bot-hosting.cloud:20112"; // THAY ĐỔI ĐỊA CHỈ API CỦA BẠN
+
+    async function claimKey() {
+        const btn = document.getElementById('get-key-btn');
+        const keyDisplay = document.getElementById('key-display');
+        const statusMsg = document.getElementById('status-msg');
+        const infoText = document.getElementById('info-text');
+
+        if (!token) {
+            statusMsg.innerHTML = "<span class='error'>Lỗi: Không tìm thấy Token hợp lệ!</span>";
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = "Đang xử lý...";
+
+        try {
+            const response = await fetch(`${API_BASE}/claim-key`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ token: token })
+            });
+
+            const data = await response.json();
+
+            if (data.status === "success") {
+                keyDisplay.innerText = data.key;
+                keyDisplay.style.display = "block";
+                statusMsg.innerHTML = "<span class='success'>Lấy key thành công! Hãy copy vào Roblox.</span>";
+                btn.style.display = "none";
+                infoText.innerText = "Key của bạn cho UserID: " + data.userid;
+            } else {
+                statusMsg.innerHTML = `<span class='error'>Lỗi: ${data.message}</span>`;
+                btn.innerHTML = "THỬ LẠI";
+                btn.disabled = false;
+            }
+        } catch (error) {
+            statusMsg.innerHTML = "<span class='error'>Không thể kết nối tới máy chủ API!</span>";
+            btn.disabled = false;
+        }
+    }
+</script>
+
+</body>
+
+</html>
