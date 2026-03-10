@@ -4,39 +4,100 @@
     <meta charset="UTF-8">
     <title>Get Your Key</title>
     <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a1a1a; color: white; }
-        .card { background: #2a2a2a; padding: 2rem; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
-        button { background: #4CAF50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; }
-        #keyDisplay { margin-top: 20px; font-weight: bold; color: #ffeb3b; font-size: 20px; }
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a1a1a; color: white; margin: 0; }
+        .card { background: #2a2a2a; padding: 2rem; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 300px; }
+        button { background: #4CAF50; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; transition: 0.3s; }
+        button:hover { background: #45a049; }
+        #keyDisplay { margin-top: 20px; font-weight: bold; color: #ffeb3b; font-size: 18px; word-wrap: break-word; min-height: 50px; }
     </style>
 </head>
 <body>
     <div class="card">
-        <h2>Vượt lỗi thành công!</h2>
-        <p>Chọn loại key bạn muốn nhận:</p>
-        <button onclick="getKey('12h')">Create Key</button>
+        <h2>Hệ Thống Key</h2>
+        <p>Bấm nút để nhận Key 12H</p>
+        <button onclick="getKey()">Create Key</button>
         <div id="keyDisplay"></div>
     </div>
 
     <script>
     async function getKey() {
         const display = document.getElementById('keyDisplay');
-        display.innerText = "Đang lấy Key...";
+        display.innerText = "Đang kết nối API...";
+
+        const targetUrl = 'http://fi12.bot-hosting.cloud:20112/generate-key';
+        
+        // Sử dụng AllOrigins để bypass Mixed Content và CORS
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
 
         try {
-           const response = await fetch('https://corsproxy.io/?' + encodeURIComponent('http://fi12.bot-hosting.cloud:20112/generate-key'), {
-                method: 'GET'
-            });
+            const response = await fetch(proxyUrl);
+            
+            if (!response.ok) throw new Error("Proxy Error");
 
-            const data = await response.json();
+            const wrapper = await response.json();
+            // AllOrigins trả về data dưới dạng string trong field 'contents'
+            const data = JSON.parse(wrapper.contents);
 
-            if (response.ok) {
+            if (data.key) {
                 display.innerText = "Key của bạn: " + data.key;
             } else {
-                display.innerText = "Lỗi: " + (data.detail || "Không thể lấy key");
+                display.innerText = "Lỗi: " + (data.detail || "Hết lượt tạo key hôm nay!");
             }
         } catch (error) {
-            display.innerText = "Lỗi kết nối API! Kiểm tra lại Server.";
+            console.error(error);
+            display.innerText = "Lỗi: API đang bận hoặc sai giao thức (HTTP/HTTPS).";
+        }
+    }
+    </script>
+</body>
+</html><!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Get Your Key</title>
+    <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #1a1a1a; color: white; margin: 0; }
+        .card { background: #2a2a2a; padding: 2rem; border-radius: 10px; text-align: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); width: 300px; }
+        button { background: #4CAF50; color: white; border: none; padding: 12px 20px; border-radius: 5px; cursor: pointer; font-size: 16px; width: 100%; transition: 0.3s; }
+        button:hover { background: #45a049; }
+        #keyDisplay { margin-top: 20px; font-weight: bold; color: #ffeb3b; font-size: 18px; word-wrap: break-word; min-height: 50px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h2>Hệ Thống Key</h2>
+        <p>Bấm nút để nhận Key 12H</p>
+        <button onclick="getKey()">Create Key</button>
+        <div id="keyDisplay"></div>
+    </div>
+
+    <script>
+    async function getKey() {
+        const display = document.getElementById('keyDisplay');
+        display.innerText = "Đang kết nối API...";
+
+        const targetUrl = 'http://fi12.bot-hosting.cloud:20112/generate-key';
+        
+        // Sử dụng AllOrigins để bypass Mixed Content và CORS
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+
+        try {
+            const response = await fetch(proxyUrl);
+            
+            if (!response.ok) throw new Error("Proxy Error");
+
+            const wrapper = await response.json();
+            // AllOrigins trả về data dưới dạng string trong field 'contents'
+            const data = JSON.parse(wrapper.contents);
+
+            if (data.key) {
+                display.innerText = "Key của bạn: " + data.key;
+            } else {
+                display.innerText = "Lỗi: " + (data.detail || "Hết lượt tạo key hôm nay!");
+            }
+        } catch (error) {
+            console.error(error);
+            display.innerText = "Lỗi: API đang bận hoặc sai giao thức (HTTP/HTTPS).";
         }
     }
     </script>
