@@ -64,42 +64,33 @@
     </div>
 
     <script>
-    async function getKey() {
-        const display = document.getElementById('keyDisplay');
-        const btn = document.getElementById('btnCreate');
-        
-        display.innerText = "Đang kết nối API...";
-        btn.disabled = true;
-
-        // URL API của ông
-        const targetUrl = 'http://fi12.bot-hosting.cloud:20112/generate-key';
-        
-        // Sử dụng AllOrigins để vượt lỗi Mixed Content (HTTPS sang HTTP)
-        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}&ts=${Date.now()}`;
-
-        try {
-            const response = await fetch(proxyUrl);
-            if (!response.ok) throw new Error("Proxy sập");
-
-            const wrapper = await response.json();
-            const data = JSON.parse(wrapper.contents);
-
-            if (data.key) {
-                display.innerText = data.key;
-                // Copy tự động
-                navigator.clipboard.writeText(data.key).then(() => {
-                    alert("Đã tự động copy Key!");
-                });
-            } else {
-                display.innerText = "Lỗi: " + (data.detail || "Không rõ lỗi");
+        async function getKey() {
+            const display = document.getElementById('keyDisplay');
+            const btn = document.getElementById('btnCreate');
+            
+            display.innerText = "Đang kết nối API...";
+            btn.disabled = true;
+    
+            // THAY LINK WORKER CỦA ÔNG VÀO ĐÂY
+            const workerUrl = 'https://key-proxy.phuongga0000a.workers.dev/';
+    
+            try {
+                const response = await fetch(workerUrl);
+                const data = await response.json();
+    
+                if (data.key) {
+                    display.innerText = data.key;
+                    navigator.clipboard.writeText(data.key);
+                    alert("Đã tự động Copy Key!");
+                } else {
+                    display.innerText = "Lỗi: " + (data.detail || "Hết lượt tạo key");
+                }
+            } catch (error) {
+                display.innerText = "Lỗi kết nối! Server API có thể đang sập.";
+            } finally {
+                btn.disabled = false;
             }
-        } catch (error) {
-            console.error(error);
-            display.innerText = "Lỗi kết nối! Kiểm tra API hoặc Proxy.";
-        } finally {
-            btn.disabled = false;
         }
-    }
     </script>
 </body>
 </html>
